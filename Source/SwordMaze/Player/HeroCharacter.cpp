@@ -6,7 +6,7 @@
 #include "Components/InputComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "Components/SphereComponent.h"
+#include "Components/BoxComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -35,21 +35,21 @@ AHeroCharacter::AHeroCharacter()
 	GetCharacterMovement()->AirControl = 0.2f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("Camera Boom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 300.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	// Create a follow camera
-	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
+	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Follow Camera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	// Create pickup sphere
-	PickupSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Pickup Sphere"));
-	PickupSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	PickupSphere->OnComponentBeginOverlap.AddDynamic(this, &AHeroCharacter::OnPickupOverlap);
-	PickupSphere->AttachTo(GetMesh());
+	PickupCollector = CreateDefaultSubobject<UBoxComponent>(TEXT("Pickup Collector"));
+	PickupCollector->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	PickupCollector->OnComponentBeginOverlap.AddDynamic(this, &AHeroCharacter::OnPickupOverlap);
+	PickupCollector->AttachTo(GetMesh());
 
 }
 
@@ -226,6 +226,6 @@ void AHeroCharacter::OnPickupOverlap_Implementation(UPrimitiveComponent * Overla
 
 	if (pickable)
 	{
-		//pickable->OnPickup( );
+		pickable->OnPickup(this);
 	}
 }

@@ -15,7 +15,7 @@ APickup::APickup()
 
 	BodyMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body"));
 	BodyMesh->SetSimulatePhysics(false);
-
+	BodyMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	RootComponent = BodyMesh;
 }
 

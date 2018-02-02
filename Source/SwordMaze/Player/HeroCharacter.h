@@ -123,7 +123,7 @@ protected:
 	class UCameraComponent* FollowCamera;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Player)
-	class USphereComponent* PickupSphere;
+	class UBoxComponent* PickupCollector;
 
 protected:
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
@@ -139,7 +139,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Player)
 	FRPGDebugFlags DebugFlags;
-
 
 private:
 	UFUNCTION(BlueprintCallable, Category = Player)

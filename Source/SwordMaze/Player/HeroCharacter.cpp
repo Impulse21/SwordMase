@@ -10,6 +10,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Pickup/Pickup.h"
 #include "BaseCharacterAnimInstance.h"
 #include "TimerManager.h"
 
@@ -47,6 +48,7 @@ AHeroCharacter::AHeroCharacter()
 	// Create pickup sphere
 	PickupSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Pickup Sphere"));
 	PickupSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	PickupSphere->OnComponentBeginOverlap.AddDynamic(this, &AHeroCharacter::OnPickupOverlap);
 	PickupSphere->AttachTo(GetMesh());
 
 }
@@ -87,8 +89,6 @@ void AHeroCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputComp
 
 	PlayerInputComponent->BindAction("Blocking", IE_Pressed, this, &AHeroCharacter::OnStartDefending);
 	PlayerInputComponent->BindAction("Blocking", IE_Released, this, &AHeroCharacter::OnStopDefending);
-
-	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &AHeroCharacter::OnInteract);
 
 	PlayerInputComponent->BindAction("Attack", IE_Pressed, this, &AHeroCharacter::OnStartAttacking);
 
@@ -188,10 +188,6 @@ void AHeroCharacter::OnStopDefending()
 	ToggleDefend(false);
 }
 
-void AHeroCharacter::OnInteract()
-{
-}
-
 FName AHeroCharacter::GetInventoryAttachPoint(EItemType const & slot)
 {
 	switch (slot)
@@ -214,5 +210,22 @@ void AHeroCharacter::PlayAttackAnim()
 	if (AnimInstance && !AnimInstance->IsPlayingAttackAnim())
 	{
 		AnimInstance->Attack();
+	}
+}
+
+void AHeroCharacter::OnPickupOverlap_Implementation(UPrimitiveComponent * OverlappedComp, 
+													AActor * OtherActor, 
+													UPrimitiveComponent * OtherComp, 
+													int32 OtherBodyIndex, 
+													bool bFromSweep, 
+													const FHitResult & SweepResult)
+{
+	UE_LOG(LogTemp, Warning, TEXT("On Pickup Occured"));
+
+	APickup* pickable = Cast<APickup>(OtherActor);
+
+	if (pickable)
+	{
+		//pickable->OnPickup( );
 	}
 }

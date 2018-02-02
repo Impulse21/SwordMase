@@ -4,6 +4,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Sound/SoundCue.h"
 #include "Kismet/GameplayStatics.h"
+#include "World/SwordMazeGameModeBase.h"
 
 
 // Sets default values

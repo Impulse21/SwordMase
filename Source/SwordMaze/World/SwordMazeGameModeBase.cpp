@@ -14,6 +14,8 @@ ASwordMazeGameModeBase::ASwordMazeGameModeBase()
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 	*/
+
+	Score = 0;
 }
 
 void ASwordMazeGameModeBase::BeginPlay()

@@ -124,6 +124,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Player)
+	class USphereComponent* PickupSphere;
+
 protected:
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
@@ -132,9 +135,6 @@ protected:
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(BlueprintReadWrite, Category = Camera)
 	float BaseLookUpRate;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Player)
-	float MaxUseDistance;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Player)
 	FRPGPlayerInput PlayerInput;

@@ -19,6 +19,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = Pickup)
 	void OnPickup(APawn* Insigator);
 
+	UFUNCTION(BlueprintCallable, Category = Pickup)
+	FORCEINLINE int GetScoreValue() const { return Score; };
+
 protected:
 	/** Disables mesh from the world										*/
 	UFUNCTION(BlueprintCallable, Category = Pickup)
@@ -29,6 +32,9 @@ protected:
 	void PlayPickupSound();
 
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Pickup)
+	int Score;
+
 	/** Static Mesh for the Pickup											*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup")
 	class UStaticMeshComponent* BodyMesh;

@@ -227,5 +227,6 @@ void AHeroCharacter::OnPickupOverlap_Implementation(UPrimitiveComponent * Overla
 	if (pickable)
 	{
 		pickable->OnPickup(this);
+		UpdatePlayerScore.Broadcast(pickable->GetScoreValue());
 	}
 }

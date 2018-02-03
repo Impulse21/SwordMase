@@ -18,7 +18,7 @@ public:
 	ASwordMazeGameModeBase();
 
 	UFUNCTION(BlueprintCallable, Category = "Score")
-	void IncrementScore();
+	void IncrementScore(int DeltaScore);
 
 	virtual void BeginPlay() override;
 

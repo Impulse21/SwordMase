@@ -52,3 +52,21 @@ ABaseCharacter* AEnemyAIController::GetTargetEnemy()
 
 	return Cast<ABaseCharacter>(BlackboardComponent->GetValueAsObject(TargetEnemyKeyName));
 }
+
+EBotState AEnemyAIController::GetBotState()
+{
+	if (BlackboardComponent)
+	{
+		return static_cast<EBotState>(BlackboardComponent->GetValueAsEnum(BotStateKeyName));
+	}
+
+	return EBotState::EI_None;
+}	
+
+void AEnemyAIController::SetNotState(EBotState const& NewState)
+{
+	if (BlackboardComponent)
+	{
+		BlackboardComponent->SetValueAsEnum(BotStateKeyName, static_cast<uint8>(NewState));
+	}
+}

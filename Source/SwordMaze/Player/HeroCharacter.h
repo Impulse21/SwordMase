@@ -47,6 +47,8 @@ struct FRPGDebugFlags
 		bool DrawUsableLineTrace;
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerScoreUpdate, int, DeltaScore);
+
 /**
  * 
  */
@@ -63,7 +65,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Player")
-		void GetCharacterInfo(FCharacterAnimationInfo& animInfo);
+	void GetCharacterInfo(FCharacterAnimationInfo& animInfo);
+
+	UPROPERTY(BlueprintAssignable, Category = PickupEvent)
+	FOnPlayerScoreUpdate UpdatePlayerScore;
 
 	/** Getter and setters			*/
 public:

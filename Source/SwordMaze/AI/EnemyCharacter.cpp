@@ -22,6 +22,7 @@ void AEnemyCharacter::BeginPlay()
 	{
 		PawnSensingComp->OnSeePawn.AddDynamic(this, &AEnemyCharacter::OnSeePlayer);
 	}
+
 }
 
 void AEnemyCharacter::OnSeePlayer_Implementation(APawn* Pawn)
@@ -32,6 +33,6 @@ void AEnemyCharacter::OnSeePlayer_Implementation(APawn* Pawn)
 	if(SensedHero && AIController)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("We have sensed the player"));
-		AIController->SetTargetEnemy(SensedHero);
+		//AIController->SetTargetEnemy(SensedHero);
 	}
 }

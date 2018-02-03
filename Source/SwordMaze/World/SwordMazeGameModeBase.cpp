@@ -3,6 +3,7 @@
 #include "SwordMazeGameModeBase.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Blueprint/UserWidget.h"
+#include "Player/HeroCharacter.h"
 
 ASwordMazeGameModeBase::ASwordMazeGameModeBase()
 {
@@ -31,9 +32,18 @@ void ASwordMazeGameModeBase::BeginPlay()
 			CurrentWidget->AddToViewport();
 		}
 	}
+
+	auto hero = Cast<AHeroCharacter>(DefaultPawnClass);
+
+	if (hero)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Setting up callback"));
+		hero->UpdatePlayerScore.AddDynamic(this, &ASwordMazeGameModeBase::IncrementScore);
+	}
 }
 
-void ASwordMazeGameModeBase::IncrementScore()
+void ASwordMazeGameModeBase::IncrementScore(int DeltaScore)
 {
-	Score++;
+	UE_LOG(LogTemp, Warning, TEXT("Update Score Event"));
+	Score += DeltaScore;
 }

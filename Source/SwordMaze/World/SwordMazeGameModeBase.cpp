@@ -33,13 +33,21 @@ void ASwordMazeGameModeBase::BeginPlay()
 		}
 	}
 
-	auto hero = Cast<AHeroCharacter>(DefaultPawnClass);
-
-	if (hero)
+	if (GetWorld()->GetFirstPlayerController() != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Setting up callback"));
-		hero->UpdatePlayerScore.AddDynamic(this, &ASwordMazeGameModeBase::IncrementScore);
+		AHeroCharacter* hero = Cast<AHeroCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+
+		if (hero)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Setting up callback"));
+			hero->UpdatePlayerScore.AddDynamic(this, &ASwordMazeGameModeBase::IncrementScore);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Hero is null"));
+		}
 	}
+
 }
 
 void ASwordMazeGameModeBase::IncrementScore(int DeltaScore)

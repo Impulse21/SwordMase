@@ -4,18 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Player/BaseCharacter.h"
+#include "Weapon/BaseWeapon.h"
 #include "CharacterAnimation.h"
 #include "HeroCharacter.generated.h"
 
-
-UENUM(BlueprintType)		//"BlueprintType" is essential to include
-enum class EItemType : uint8
-{
-	EI_Primary 		UMETA(DisplayName = "Weapon"),
-	EI_Secondary 	UMETA(DisplayName = "Secondary/Sheild"),
-	EI_Armour		UMETA(DisplayName = "Armour"),
-	EI_Consumable	UMETA(DisplayName = "Consumable")
-};
 
 USTRUCT(Blueprintable)
 struct FRPGPlayerInput
@@ -43,8 +35,8 @@ struct FRPGDebugFlags
 {
 	GENERATED_BODY()
 
-		UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool DrawUsableLineTrace;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool DrawUsableLineTrace;
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerScoreUpdate, int, DeltaScore);

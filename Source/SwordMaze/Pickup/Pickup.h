@@ -18,6 +18,7 @@ public:
 	/** Event that is used for pickups										*/
 	UFUNCTION(BlueprintNativeEvent, Category = Pickup)
 	void OnPickup(APawn* Insigator);
+	virtual void OnPickup_Implementation(APawn* Insigator);
 
 	UFUNCTION(BlueprintCallable, Category = Pickup)
 	FORCEINLINE int GetScoreValue() const { return Score; };
@@ -36,7 +37,7 @@ protected:
 	int Score;
 
 	/** Static Mesh for the Pickup											*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup", meta = (AllowPrivateAccess = "true"))
 	class UStaticMeshComponent* BodyMesh;
 
 	/** Sound that is made when the Item is picked up						*/

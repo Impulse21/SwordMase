@@ -52,6 +52,6 @@ void ASwordMazeGameModeBase::BeginPlay()
 
 void ASwordMazeGameModeBase::IncrementScore(int DeltaScore)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Update Score Event"));
+	UE_LOG(LogTemp, Warning, TEXT("Updating score %i"), DeltaScore);
 	Score += DeltaScore;
 }

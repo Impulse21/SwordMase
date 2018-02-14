@@ -17,8 +17,8 @@ public:
 
 	/** Event that is used for pickups										*/
 	UFUNCTION(BlueprintNativeEvent, Category = Pickup)
-	void OnPickup(APawn* Insigator);
-	virtual void OnPickup_Implementation(APawn* Insigator);
+	void OnPickup(APawn* PawnInstigator);
+	virtual void OnPickup_Implementation(APawn* PawnInstigator);
 
 	UFUNCTION(BlueprintCallable, Category = Pickup)
 	FORCEINLINE int GetScoreValue() const { return Score; };

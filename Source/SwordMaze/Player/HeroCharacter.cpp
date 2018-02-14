@@ -230,3 +230,11 @@ void AHeroCharacter::OnPickupOverlap_Implementation(UPrimitiveComponent * Overla
 		UpdatePlayerScore.Broadcast(pickable->GetScoreValue());
 	}
 }
+
+void AHeroCharacter::AddWeapon(class ABaseWeapon* Weapon)
+{
+	if (Weapon)
+	{
+		Weapon->OnEquip(this);
+	}
+}

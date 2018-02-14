@@ -25,7 +25,7 @@ APickup::APickup()
 	BodyMesh->AttachTo(RootComponent);
 }
 
-void APickup::OnPickup_Implementation(APawn* Insigator)
+void APickup::OnPickup_Implementation(APawn* PawnInstigator)
 {
 	PlayPickupSound();
 	HideMesh();

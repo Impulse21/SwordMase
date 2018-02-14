@@ -18,7 +18,7 @@ class SWORDMAZE_API AWeaponPickup : public APickup
 public:
 	AWeaponPickup();
 
-	virtual void OnPickup_Implementation(APawn* Insigator) override;
+	virtual void OnPickup_Implementation(APawn* PawnInstigator) override;
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category = Weapon)

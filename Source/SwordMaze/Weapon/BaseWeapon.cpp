@@ -29,10 +29,14 @@ void ABaseWeapon::NotifyActorBeginOverlap(AActor* OtherActor)
 	}
 }
 
-void ABaseWeapon::OnEquip_Implementation()
+void ABaseWeapon::OnEquip_Implementation(AHeroCharacter* NewOwner)
 {
 	UE_LOG(LogTemp, Warning, TEXT("On Equiped is called"));
-	AttachMeshToPawn();
+	if (NewOwner)
+	{
+		SetPawnOwner(NewOwner);
+		AttachMeshToPawn();
+	}
 }
 
 AHeroCharacter * ABaseWeapon::GetPawnOwner() const

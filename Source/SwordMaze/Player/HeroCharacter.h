@@ -59,8 +59,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Player")
 	void GetCharacterInfo(FCharacterAnimationInfo& animInfo);
 
-	UPROPERTY(BlueprintAssignable, Category = PickupEvent)
-	FOnPlayerScoreUpdate UpdatePlayerScore;
+	UFUNCTION(BlueprintCallable, Category = "Player")
+	void AddWeapon(class ABaseWeapon* Weapon);
 
 	/** Getter and setters			*/
 public:
@@ -70,7 +70,12 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	UFUNCTION(BlueprintCallable, Category = Player)
-		FName GetInventoryAttachPoint(EItemType const& slot);
+	FName GetInventoryAttachPoint(EItemType const& slot);
+
+
+	UPROPERTY(BlueprintAssignable, Category = PickupEvent)
+	FOnPlayerScoreUpdate UpdatePlayerScore;
+
 
 	/** Inputs					*/
 protected:
@@ -137,6 +142,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Player)
 	FRPGDebugFlags DebugFlags;
 
+	UPROPERTY(Transient)
+	class ABaseWeapon* EquipedWeapon;
+
 private:
 	UFUNCTION(BlueprintCallable, Category = Player)
 	void PlayAttackAnim();
@@ -151,6 +159,10 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Equiptment")
 	FName HeadArmourSocketName;
 
+	UPROPERTY()
+	FTimerHandle WeaponEquipedTimer;
+
 	FTimerHandle AttackTimeHandler;
+
 	bool bHasNewFocus;	
 };

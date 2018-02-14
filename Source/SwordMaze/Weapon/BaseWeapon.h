@@ -33,7 +33,7 @@ public:
 
 public:
 	UFUNCTION(BlueprintNativeEvent, Category = Weapon)
-	void OnEquip() override;
+	void OnEquip(class AHeroCharacter* NewOwner) override;
 
 	UFUNCTION(BlueprintPure, Category = Weapon)
 	class AHeroCharacter* GetPawnOwner() const;

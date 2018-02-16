@@ -35,6 +35,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = Weapon)
 	void OnEquip(class AHeroCharacter* NewOwner) override;
 
+	UFUNCTION(BlueprintNativeEvent, Category = Weapon)
+	void OnUnEquip() override;
+
 	UFUNCTION(BlueprintPure, Category = Weapon)
 	class AHeroCharacter* GetPawnOwner() const;
 
@@ -43,6 +46,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	void AttachMeshToPawn();
+
+	UFUNCTION(BlueprintCallable, Category = Weapon)
+	void DetachMeshFromPawn();
 
 protected:
 	/** Weapon's Mesh			*/

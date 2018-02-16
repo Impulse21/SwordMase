@@ -36,7 +36,17 @@ void ABaseWeapon::OnEquip_Implementation(AHeroCharacter* NewOwner)
 	{
 		SetPawnOwner(NewOwner);
 		AttachMeshToPawn();
+		GetWorld()->DestroyActor<ABaseWeapon>();
 	}
+}
+
+void ABaseWeapon::OnUnEquip_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("On UnEquiped is called"));
+
+	SetPawnOwner(nullptr);
+	DetachMeshFromPawn();
+
 }
 
 AHeroCharacter * ABaseWeapon::GetPawnOwner() const
@@ -61,6 +71,12 @@ void ABaseWeapon::AttachMeshToPawn()
 		Mesh->SetHiddenInGame(false);
 		Mesh->AttachToComponent(PawnMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, AttachPoint);
 	}
+}
+
+void ABaseWeapon::DetachMeshFromPawn()
+{
+	Mesh->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	Mesh->SetActive(true);
 }
 
 void ABaseWeapon::DamageActor(AActor * HitActor)

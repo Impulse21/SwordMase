@@ -69,6 +69,9 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
+	UFUNCTION(BlueprintPure, Category = Player)
+	FORCEINLINE bool IsWeaponEquiped() const { return (EquipedWeapon != nullptr); };
+
 	UFUNCTION(BlueprintCallable, Category = Player)
 	FName GetInventoryAttachPoint(EItemType const& slot);
 
@@ -108,6 +111,9 @@ protected:
 	/** Player wants to attack							*/
 	void OnStartAttacking();
 	void OnStopAttacking();
+
+	UFUNCTION()
+	void OnEquipTimerEnd();
 
 	UFUNCTION(BlueprintNativeEvent, Category = Player)
 	void OnPickupOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, 

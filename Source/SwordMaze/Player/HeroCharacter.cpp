@@ -235,6 +235,19 @@ void AHeroCharacter::AddWeapon(class ABaseWeapon* Weapon)
 {
 	if (Weapon)
 	{
-		Weapon->OnEquip(this);
+		EquipedWeapon = Weapon;
+		EquipedWeapon->OnEquip(this);
+
+		UE_LOG(LogTemp, Warning, TEXT("Starting Game time for Weapon Equip Time"));
+		GetWorldTimerManager().SetTimer(WeaponEquipedTimer, this, &AHeroCharacter::OnEquipTimerEnd, 3.0f, true, 0.0f);
+	}
+}
+
+void AHeroCharacter::OnEquipTimerEnd()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Remove Weapon"));
+	if (EquipedWeapon)
+	{
+		EquipedWeapon->OnUnEquip();
 	}
 }

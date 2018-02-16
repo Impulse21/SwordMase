@@ -36,7 +36,6 @@ void ABaseWeapon::OnEquip_Implementation(AHeroCharacter* NewOwner)
 	{
 		SetPawnOwner(NewOwner);
 		AttachMeshToPawn();
-		GetWorld()->DestroyActor<ABaseWeapon>();
 	}
 }
 
@@ -47,6 +46,7 @@ void ABaseWeapon::OnUnEquip_Implementation()
 	SetPawnOwner(nullptr);
 	DetachMeshFromPawn();
 
+	GetWorld()->DestroyActor(this, false, true);
 }
 
 AHeroCharacter * ABaseWeapon::GetPawnOwner() const

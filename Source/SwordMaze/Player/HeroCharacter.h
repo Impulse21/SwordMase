@@ -56,6 +56,8 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Player")
 	void GetCharacterInfo(FCharacterAnimationInfo& animInfo);
 

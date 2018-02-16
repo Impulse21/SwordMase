@@ -239,7 +239,7 @@ void AHeroCharacter::AddWeapon(class ABaseWeapon* Weapon)
 		EquipedWeapon->OnEquip(this);
 
 		UE_LOG(LogTemp, Warning, TEXT("Starting Game time for Weapon Equip Time"));
-		GetWorldTimerManager().SetTimer(WeaponEquipedTimer, this, &AHeroCharacter::OnEquipTimerEnd, 3.0f, true, 0.0f);
+		GetWorldTimerManager().SetTimer(WeaponEquipedTimer, this, &AHeroCharacter::OnEquipTimerEnd, 3.0f, true);
 	}
 }
 
@@ -249,5 +249,13 @@ void AHeroCharacter::OnEquipTimerEnd()
 	if (EquipedWeapon)
 	{
 		EquipedWeapon->OnUnEquip();
+		EquipedWeapon = nullptr;
 	}
+}
+
+void AHeroCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	GetWorldTimerManager().ClearAllTimersForObject(this);
 }

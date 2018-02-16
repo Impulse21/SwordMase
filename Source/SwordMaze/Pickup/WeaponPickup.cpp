@@ -22,9 +22,8 @@ void AWeaponPickup::OnPickup_Implementation(APawn* PawnInstigator)
 		FActorSpawnParameters SpawnInfo;
 		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		ABaseWeapon* NewWeapon = GetWorld()->SpawnActor<ABaseWeapon>(WeaponClass, SpawnInfo);
+		heroPawn->AddWeapon(NewWeapon);
 
-		//
-		//heroPawn->
 		Super::OnPickup_Implementation(Instigator);
 	}
 

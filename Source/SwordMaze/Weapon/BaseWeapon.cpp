@@ -56,12 +56,10 @@ void ABaseWeapon::AttachMeshToPawn()
 {
 	if (MyPawn)
 	{
-		/*
 		USkeletalMeshComponent* PawnMesh = MyPawn->GetMesh();
 		FName AttachPoint = MyPawn->GetInventoryAttachPoint(InventorySlot);
 		Mesh->SetHiddenInGame(false);
 		Mesh->AttachToComponent(PawnMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, AttachPoint);
-		*/
 	}
 }
 

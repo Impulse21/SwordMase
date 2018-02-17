@@ -17,20 +17,9 @@ class SWORDMAZE_API AEnemyCharacter : public ABaseCharacter
 public:
 	AEnemyCharacter();
 
-	virtual void BeginPlay() override;
-
 public:
 	UFUNCTION(BlueprintPure, Category = EnemyAI)
 	FORCEINLINE class UBehaviorTree* GetBotBehavior() { return BotBehavior; };
-
-protected:
-	UFUNCTION(BlueprintNativeEvent, Category = EnemyAI)
-	void OnSeePlayer(APawn* Pawn);
-
-	/** Components			*/
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Enemy)
-	class UPawnSensingComponent* PawnSensingComp;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Enemy)

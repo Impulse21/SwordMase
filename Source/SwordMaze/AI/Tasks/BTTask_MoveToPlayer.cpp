@@ -28,7 +28,6 @@ EBTNodeResult::Type UBTTask_MoveToPlayer::ExecuteTask(UBehaviorTreeComponent& Ow
 			UE_LOG(LogTemp, Warning, TEXT("Distance is %f"), distance);
 		}
 
-
 		CharPC->MoveToActor(Enemy, 5.0f, true, true, true, 0, true);
 
 		return EBTNodeResult::Succeeded;

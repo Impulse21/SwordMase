@@ -2,6 +2,9 @@
 
 #include "MazeGenerator.h"
 #include "Components/InstancedStaticMeshComponent.h"
+#include "Runtime/Core/Public/HAL/PlatformFilemanager.h"
+#include "Runtime/Core/Public/GenericPlatform/GenericPlatformFile.h"
+#include "Runtime/Core/Public/Misc/FileHelper.h"
 
 // Sets default values
 AMazeGenerator::AMazeGenerator()
@@ -9,8 +12,17 @@ AMazeGenerator::AMazeGenerator()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	if (!RootComponent)
+	{
+		RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Default Subobject"));
+	}
+
 	FloorTile = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("Floor Mesh"));
-	RootComponent = FloorTile;
+	FloorTile->AttachTo(RootComponent);
+
+	WallTile = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("Wall Mesh"));
+	WallTile->AttachTo(RootComponent);
+
 
 	MaxX = 1;
 	MaxY = 1;
@@ -27,15 +39,16 @@ void AMazeGenerator::OnConstruction(const FTransform& Transform)
 		return;
 	}
 
-	const int NumOfTiles = MaxX * MaxY;
-	Map.SetNum(NumOfTiles, true);
-
-	for (int i = 0; i < NumOfTiles; i++)
+	FString FileContents;
+	if (!GetLevelDataFromFile(FileContents))
 	{
-		const FIntVector Position((i / MaxY) * TileSize , (i % MaxY) * TileSize, 0);
-		const FTransform InstanceTranfrom(static_cast<FVector>(Position));
-		FloorTile->AddInstance(InstanceTranfrom);
+		UE_LOG(LogTemp, Warning, TEXT("Failed to get file data"));
+		return;
 	}
+
+	BuildMapMemory(FileContents);
+
+	DrawMap();
 }
 
 
@@ -45,3 +58,95 @@ void AMazeGenerator::BeginPlay()
 	Super::BeginPlay();
 }
 
+
+void AMazeGenerator::LoadLevelData()
+{
+	FString FileConent;
+	if (!GetLevelDataFromFile(FileConent))
+	{
+		return;
+	}
+}
+
+bool AMazeGenerator::GetLevelDataFromFile(FString&  FileContent)
+{
+	IPlatformFile& PlatformFile = FPlatformFileManager::Get().GetPlatformFile();
+
+	if (!FFileHelper::LoadFileToString(FileContent, *LevelDataFile))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Failed to load tile %s"), *LevelDataFile);
+		return false;
+	}
+
+	return true;
+}
+
+void AMazeGenerator::BuildMapMemory(FString & MapData)
+{
+	// Clear Current Map Data
+	Map.Empty();
+
+	FTileMapRow Row;
+	for (int i = 0; i < MapData.Len(); i++)
+	{
+		FString currChar = MapData.Mid(i, 1);
+		if (currChar.Equals("\r"))
+		{
+			continue;
+		}
+
+		if (currChar.Equals("\n"))
+		{
+			Map.Push(Row);
+			Row.Data.Empty();
+			continue;
+		}
+
+		int tileValue = FCString::Atoi(*currChar);
+
+		Row.Data.Push(static_cast<ETileType>(tileValue));
+	}
+
+	// Push last row
+	Map.Push(Row);
+}
+
+void AMazeGenerator::DrawMap()
+{
+	const int MaxRows = Map.Num();
+	int X = 0;
+	int Y = 0;
+
+	// Clear current map
+	WallTile->ClearInstances();
+	FloorTile->ClearInstances();
+
+	for (int i = 0; i < MaxRows; i++)
+	{
+		for (auto& tileType : Map[i].Data)
+		{
+			const FIntVector Position(X, Y, 0);
+			const FTransform InstanceTranfrom(static_cast<FVector>(Position));
+
+			switch (tileType)
+			{
+			case ETileType::TT_Wall:
+				WallTile->AddInstance(InstanceTranfrom);
+				FloorTile->AddInstance(InstanceTranfrom);
+				break;
+
+			case ETileType::TT_Floor:
+				FloorTile->AddInstance(InstanceTranfrom);
+				break;
+			default:
+				UE_LOG(LogTemp, Warning, TEXT("Unkown tile %d"), static_cast<int>(tileType));
+				break;
+			}
+
+			X += TileSize;
+		}
+
+		X = 0;
+		Y += TileSize;
+	}
+}

@@ -13,6 +13,17 @@ enum class ETileType : uint8
 	TT_Wall
 };
 
+USTRUCT()
+struct FTileMapRow
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY()
+	TArray<ETileType> Data;
+
+};
+
 UCLASS()
 class SWORDMAZE_API AMazeGenerator : public AActor
 {
@@ -24,13 +35,28 @@ public:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void LoadLevelData();
+
+	bool GetLevelDataFromFile(FString& FileContent);
+
+	void BuildMapMemory(FString& MapData);
+
+	void DrawMap();
+
 protected: // Components
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Maze)
 	class UInstancedStaticMeshComponent* FloorTile;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Maze)
+	class UInstancedStaticMeshComponent* WallTile;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Maze)
+	FString LevelDataFile;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Maze)
 	int MaxX;
@@ -43,5 +69,5 @@ protected: // Components
 
 private:
 	UPROPERTY(Transient)
-	TArray<ETileType> Map;
+	TArray<FTileMapRow> Map;
 };

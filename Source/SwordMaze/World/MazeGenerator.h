@@ -10,7 +10,8 @@ UENUM()
 enum class ETileType : uint8
 {
 	TT_Floor,
-	TT_Wall
+	TT_Wall,
+	TT_FloorWithPickup
 };
 
 USTRUCT()
@@ -35,7 +36,6 @@ public:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -48,6 +48,12 @@ protected:
 
 	void DrawMap();
 
+	UFUNCTION(BlueprintCallable, Category = Maze)
+	void SpawnPickup(FVector const& Position);
+
+	UFUNCTION(BlueprintCallable, Category = Maze)
+	void CleanMap();
+
 protected: // Components
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Maze)
 	class UInstancedStaticMeshComponent* FloorTile;
@@ -56,18 +62,17 @@ protected: // Components
 	class UInstancedStaticMeshComponent* WallTile;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Maze)
+	TSubclassOf<class APickup> Pickup;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Maze)
 	FString LevelDataFile;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Maze)
-	int MaxX;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Maze)
-	int MaxY;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Maze)
 	int TileSize;
 
-private:
 	UPROPERTY(Transient)
 	TArray<FTileMapRow> Map;
+
+	UPROPERTY(Transient)
+	TArray<class APickup*> PickupInstances;
 };

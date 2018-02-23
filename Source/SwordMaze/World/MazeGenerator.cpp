@@ -5,6 +5,8 @@
 #include "Runtime/Core/Public/HAL/PlatformFilemanager.h"
 #include "Runtime/Core/Public/GenericPlatform/GenericPlatformFile.h"
 #include "Runtime/Core/Public/Misc/FileHelper.h"
+#include "Engine/World.h"
+#include "Pickup/Pickup.h"
 
 // Sets default values
 AMazeGenerator::AMazeGenerator()
@@ -23,9 +25,6 @@ AMazeGenerator::AMazeGenerator()
 	WallTile = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("Wall Mesh"));
 	WallTile->AttachTo(RootComponent);
 
-
-	MaxX = 1;
-	MaxY = 1;
 	TileSize = 100;
 }
 
@@ -118,6 +117,7 @@ void AMazeGenerator::DrawMap()
 	int Y = 0;
 
 	// Clear current map
+	//CleanMap();
 	WallTile->ClearInstances();
 	FloorTile->ClearInstances();
 
@@ -137,6 +137,7 @@ void AMazeGenerator::DrawMap()
 
 			case ETileType::TT_Floor:
 				FloorTile->AddInstance(InstanceTranfrom);
+				//SpawnPickup(InstanceTranfrom.GetLocation());
 				break;
 			default:
 				UE_LOG(LogTemp, Warning, TEXT("Unkown tile %d"), static_cast<int>(tileType));
@@ -149,4 +150,26 @@ void AMazeGenerator::DrawMap()
 		X = 0;
 		Y += TileSize;
 	}
+}
+
+void AMazeGenerator::SpawnPickup(FVector const& Position)
+{
+	if (Pickup)
+	{
+		APickup* NewInstance = GetWorld()->SpawnActor<APickup>(Pickup, Position + GetActorLocation(), FRotator::ZeroRotator);
+		PickupInstances.Push(NewInstance);
+	}
+}
+
+void AMazeGenerator::CleanMap()
+{
+	WallTile->ClearInstances();
+	FloorTile->ClearInstances();
+
+	for (APickup* pickup : PickupInstances)
+	{
+		GetWorld()->DestroyActor(pickup);
+	}
+
+	PickupInstances.Empty();
 }

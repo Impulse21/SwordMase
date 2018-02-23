@@ -20,11 +20,14 @@ AMazeGenerator::AMazeGenerator()
 	}
 
 	FloorTile = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("Floor Mesh"));
+	FloorTile->bCastDynamicShadow = false;
 	FloorTile->AttachTo(RootComponent);
 
 	WallTile = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("Wall Mesh"));
+	WallTile->bCastDynamicShadow = false;
 	WallTile->AttachTo(RootComponent);
 
+	
 	TileSize = 100;
 }
 
@@ -55,17 +58,6 @@ void AMazeGenerator::OnConstruction(const FTransform& Transform)
 void AMazeGenerator::BeginPlay()
 {
 	Super::BeginPlay();
-
-	UE_LOG(LogTemp, Warning, TEXT("Number of Spawn Locations %d"), SpawnLocation.Num());
-
-	if (Pickup)
-	{
-		for (FVector pos : SpawnLocation)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Spawning Actor"));
-			SpawnPickup(pos);
-		}
-	}
 }
 
 
@@ -146,7 +138,6 @@ void AMazeGenerator::DrawMap()
 
 			case ETileType::TT_Floor:
 				FloorTile->AddInstance(InstanceTranfrom);
-				SpawnLocation.Push(InstanceTranfrom.GetLocation() + GetActorLocation());
 				break;
 			default:
 				UE_LOG(LogTemp, Warning, TEXT("Unkown tile %d"), static_cast<int>(tileType));
@@ -166,6 +157,7 @@ void AMazeGenerator::SpawnPickup(FVector const& Position)
 	if (Pickup)
 	{
 		APickup* NewInstance = GetWorld()->SpawnActor<APickup>(Pickup, Position + GetActorLocation(), FRotator::ZeroRotator);
+		PickupInstances.Push(NewInstance);
 	}
 }
 
@@ -173,5 +165,11 @@ void AMazeGenerator::CleanMap()
 {
 	WallTile->ClearInstances();
 	FloorTile->ClearInstances();
-	SpawnLocation.Empty();
+	
+	for (auto Instance : PickupInstances)
+	{
+		GetWorld()->DestroyActor(Instance);
+	}
+
+	PickupInstances.Empty();
 }

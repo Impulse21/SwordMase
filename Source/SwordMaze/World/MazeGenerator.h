@@ -74,5 +74,5 @@ protected: // Components
 	TArray<FTileMapRow> Map;
 
 	UPROPERTY(Transient)
-	TArray<FVector> SpawnLocation;
+	TArray<class APickup*> PickupInstances;
 };

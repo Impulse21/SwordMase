@@ -41,6 +41,12 @@ public:
 	void SetTargetEnemy(APawn* NewTarget);
 
 	UFUNCTION(BlueprintCallable, Category = EnemyAI)
+	bool GetTargetLocation(FVector& Vector);
+
+	UFUNCTION(BlueprintCallable, Category = EnemyAI)
+	void SetTargetLocation(FVector const& NewTarget);
+
+	UFUNCTION(BlueprintCallable, Category = EnemyAI)
 	EBotState GetBotState();
 
 	UFUNCTION(BlueprintCallable, Category = EnemyAI)
@@ -53,6 +59,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "EnemyAI")
 	FName BotStateKeyName;
+
+	UPROPERTY(EditDefaultsOnly, Category = "EnemyAI")
+	FName TargetLocationKeyName;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = EnemyAI)

@@ -13,6 +13,7 @@ AEnemyAIController::AEnemyAIController()
 	BlackboardComponent = CreateDefaultSubobject<UBlackboardComponent>(TEXT("Blackbaord"));
 
 	TargetEnemyKeyName = "TargetEnemy";
+	TargetLocationKeyName = "TargetLocation";
 }
 
 void AEnemyAIController::Possess(APawn * InPawn)
@@ -68,5 +69,24 @@ void AEnemyAIController::SetNotState(EBotState const& NewState)
 	if (BlackboardComponent)
 	{
 		BlackboardComponent->SetValueAsEnum(BotStateKeyName, static_cast<uint8>(NewState));
+	}
+}
+
+bool AEnemyAIController::GetTargetLocation(FVector& Vector)
+{
+	if (BlackboardComponent == nullptr)
+	{
+		return false;
+	}
+
+	Vector = BlackboardComponent->GetValueAsVector(TargetLocationKeyName);
+	return true;
+}
+
+void AEnemyAIController::SetTargetLocation(FVector const& NewTarget)
+{
+	if (BlackboardComponent)
+	{
+		BlackboardComponent->SetValueAsVector(TargetLocationKeyName, NewTarget);
 	}
 }

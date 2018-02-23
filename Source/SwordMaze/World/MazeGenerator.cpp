@@ -55,6 +55,17 @@ void AMazeGenerator::OnConstruction(const FTransform& Transform)
 void AMazeGenerator::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UE_LOG(LogTemp, Warning, TEXT("Number of Spawn Locations %d"), SpawnLocation.Num());
+
+	if (Pickup)
+	{
+		for (FVector pos : SpawnLocation)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Spawning Actor"));
+			SpawnPickup(pos);
+		}
+	}
 }
 
 
@@ -116,10 +127,8 @@ void AMazeGenerator::DrawMap()
 	int X = 0;
 	int Y = 0;
 
-	// Clear current map
-	//CleanMap();
-	WallTile->ClearInstances();
-	FloorTile->ClearInstances();
+	//Clear current map
+	CleanMap();
 
 	for (int i = 0; i < MaxRows; i++)
 	{
@@ -137,7 +146,7 @@ void AMazeGenerator::DrawMap()
 
 			case ETileType::TT_Floor:
 				FloorTile->AddInstance(InstanceTranfrom);
-				//SpawnPickup(InstanceTranfrom.GetLocation());
+				SpawnLocation.Push(InstanceTranfrom.GetLocation() + GetActorLocation());
 				break;
 			default:
 				UE_LOG(LogTemp, Warning, TEXT("Unkown tile %d"), static_cast<int>(tileType));
@@ -157,7 +166,6 @@ void AMazeGenerator::SpawnPickup(FVector const& Position)
 	if (Pickup)
 	{
 		APickup* NewInstance = GetWorld()->SpawnActor<APickup>(Pickup, Position + GetActorLocation(), FRotator::ZeroRotator);
-		PickupInstances.Push(NewInstance);
 	}
 }
 
@@ -165,11 +173,5 @@ void AMazeGenerator::CleanMap()
 {
 	WallTile->ClearInstances();
 	FloorTile->ClearInstances();
-
-	for (APickup* pickup : PickupInstances)
-	{
-		GetWorld()->DestroyActor(pickup);
-	}
-
-	PickupInstances.Empty();
+	SpawnLocation.Empty();
 }

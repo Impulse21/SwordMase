@@ -27,7 +27,6 @@ APickup::APickup()
 
 void APickup::OnPickup_Implementation(APawn* PawnInstigator)
 {
-	PlayPickupSound();
 	HideMesh();
 	PlayPickupSound();
 

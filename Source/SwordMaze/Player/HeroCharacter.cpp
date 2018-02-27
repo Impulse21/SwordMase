@@ -12,7 +12,9 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Pickup/Pickup.h"
 #include "BaseCharacterAnimInstance.h"
+#include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
+#include "Sound/SoundCue.h"
 
 AHeroCharacter::AHeroCharacter()
 {
@@ -235,22 +237,43 @@ void AHeroCharacter::AddWeapon(class ABaseWeapon* Weapon)
 {
 	if (Weapon)
 	{
-		EquipedWeapon = Weapon;
-		EquipedWeapon->OnEquip(this);
+		if (EquipedWeapon == nullptr)
+		{
+			EquipedWeapon = Weapon;
+			EquipedWeapon->OnEquip(this);
+		}
 
+		if (GetWorldTimerManager().IsTimerActive(WeaponEquipedTimeHandler))
+		{
+			GetWorldTimerManager().ClearTimer(WeaponEquipedTimeHandler);
+		}
+
+		ElapsedTime = 0;
+		CurrTimerZone = ECountdownTimerZone::CTZ_Normal;
 		UE_LOG(LogTemp, Warning, TEXT("Starting Game time for Weapon Equip Time"));
-		GetWorldTimerManager().SetTimer(WeaponEquipedTimer, this, &AHeroCharacter::OnEquipTimerEnd, 3.0f, true);
+		GetWorldTimerManager().SetTimer(WeaponEquipedTimeHandler, this, &AHeroCharacter::OnEquipTimerEnd, 1.0f, true);
 	}
 }
 
 void AHeroCharacter::OnEquipTimerEnd()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Remove Weapon"));
-	if (EquipedWeapon)
+	if (EquipedWeapon == nullptr)
+	{
+		return;
+	}
+
+	if (ElapsedTime >= WeaponEquipTime)
 	{
 		EquipedWeapon->OnUnEquip();
 		EquipedWeapon = nullptr;
+		GetWorldTimerManager().ClearTimer(WeaponEquipedTimeHandler);
 	}
+	else
+	{
+		PlayCurrSoundCue();
+		ElapsedTime += GetWorldTimerManager().GetTimerElapsed(WeaponEquipedTimeHandler);
+	}
+
 }
 
 void AHeroCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -258,4 +281,38 @@ void AHeroCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 
 	GetWorldTimerManager().ClearAllTimersForObject(this);
+}
+
+void AHeroCharacter::UpdateCurrentTimerZone()
+{
+	const float PercentageOfTime = (ElapsedTime / WeaponEquipTime) * 100.0f;
+
+	if (PercentageOfTime < 50.0f)
+	{
+		CurrTimerZone = ECountdownTimerZone::CTZ_Normal;
+	}
+	else if (PercentageOfTime > 50.0f && PercentageOfTime < 75.0f)
+	{
+		CurrTimerZone = ECountdownTimerZone::CTZ_High;
+	}
+	else if (PercentageOfTime > 75.0f)
+	{
+		CurrTimerZone = ECountdownTimerZone::CTZ_Critical;
+	}
+	else
+	{
+		CurrTimerZone = ECountdownTimerZone::CTZ_Normal;
+	}
+}
+
+void AHeroCharacter::PlayCurrSoundCue()
+{
+	UpdateCurrentTimerZone();
+
+	auto Sound = SoundMap[CurrTimerZone];
+
+	if (Sound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, Sound, GetActorLocation());
+	}
 }

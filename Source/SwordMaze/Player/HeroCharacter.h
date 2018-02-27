@@ -39,6 +39,14 @@ struct FRPGDebugFlags
 	bool DrawUsableLineTrace;
 };
 
+UENUM(Blueprintable)
+enum class ECountdownTimerZone : uint8
+{
+	CTZ_Normal,
+	CTZ_High,
+	CTZ_Critical
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerScoreUpdate, int, DeltaScore);
 
 /**
@@ -122,6 +130,12 @@ protected:
 						 UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, 
 						 bool bFromSweep, const FHitResult& SweepResult);
 
+	UFUNCTION(BlueprintCallable, Category = Player)
+	void UpdateCurrentTimerZone();
+
+	UFUNCTION(BlueprintCallable, Category = Player)
+	void PlayCurrSoundCue();
+
 	/** Components				*/
 protected:
 	/** Camera boom positioning the camera behind the character */
@@ -143,6 +157,12 @@ protected:
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(BlueprintReadWrite, Category = Camera)
 	float BaseLookUpRate;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Player)
+	TMap<ECountdownTimerZone, class USoundCue*> SoundMap;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Player)
+	float WeaponEquipTime;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Player)
 	FRPGPlayerInput PlayerInput;
@@ -168,9 +188,17 @@ private:
 	FName HeadArmourSocketName;
 
 	UPROPERTY()
-	FTimerHandle WeaponEquipedTimer;
+	FTimerHandle WeaponEquipedTimeHandler;
 
+	UPROPERTY()
 	FTimerHandle AttackTimeHandler;
+
+	UPROPERTY()
+	float ElapsedTime;
+	
+	UPROPERTY()
+	ECountdownTimerZone CurrTimerZone;
+
 
 	bool bHasNewFocus;	
 };

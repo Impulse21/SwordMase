@@ -131,7 +131,10 @@ protected:
 						 bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION(BlueprintCallable, Category = Player)
-	void UpdateCurrentTimerZone();
+	bool UpdateCurrentTimerZone();
+
+	UFUNCTION(BlueprintCallable, Category = Player)
+	float GetZoneTimeDelay(ECountdownTimerZone const& TimerZone);
 
 	UFUNCTION(BlueprintCallable, Category = Player)
 	void PlayCurrSoundCue();

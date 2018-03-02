@@ -13,6 +13,7 @@
 #include "Pickup/Pickup.h"
 #include "BaseCharacterAnimInstance.h"
 #include "Kismet/GameplayStatics.h"
+#include "Animation/CharacterAnimInstance.h"
 #include "TimerManager.h"
 #include "Sound/SoundCue.h"
 
@@ -149,9 +150,12 @@ void AHeroCharacter::MoveRight(float Value)
 
 void AHeroCharacter::OnStartAttacking()
 {
-	PlayerInput.AttackPressed = true;
-	UE_LOG(LogTemp, Warning, TEXT("Attacking"));
-	GetWorldTimerManager().SetTimer(AttackTimeHandler, this, &AHeroCharacter::OnStopAttacking, 3.0f, true, 0.0f);
+	if (EquipedWeapon)
+	{
+		PlayerInput.AttackPressed = true;
+		UE_LOG(LogTemp, Warning, TEXT("Attacking"));
+		GetWorldTimerManager().SetTimer(AttackTimeHandler, this, &AHeroCharacter::OnStopAttacking, 3.0f, true, 0.0f);
+	}
 }
 
 void AHeroCharacter::OnStopAttacking()
@@ -207,7 +211,7 @@ FName AHeroCharacter::GetInventoryAttachPoint(EItemType const & slot)
 
 void AHeroCharacter::PlayAttackAnim()
 {
-	UBaseCharacterAnimInstance* AnimInstance = Cast<UBaseCharacterAnimInstance>(GetMesh()->GetAnimInstance());
+	UCharacterAnimInstance* AnimInstance = Cast<UCharacterAnimInstance>(GetMesh()->GetAnimInstance());
 
 	if (AnimInstance && !AnimInstance->IsPlayingAttackAnim())
 	{
@@ -251,7 +255,7 @@ void AHeroCharacter::AddWeapon(class ABaseWeapon* Weapon)
 		ElapsedTime = 0;
 		CurrTimerZone = ECountdownTimerZone::CTZ_Normal;
 		UE_LOG(LogTemp, Warning, TEXT("Starting Game time for Weapon Equip Time"));
-		GetWorldTimerManager().SetTimer(WeaponEquipedTimeHandler, this, &AHeroCharacter::OnEquipTimerEnd, 1.0f, true);
+		GetWorldTimerManager().SetTimer(WeaponEquipedTimeHandler, this, &AHeroCharacter::OnEquipTimerEnd, GetZoneTimeDelay(CurrTimerZone), true);
 	}
 }
 
@@ -261,6 +265,8 @@ void AHeroCharacter::OnEquipTimerEnd()
 	{
 		return;
 	}
+
+	bool updatedZone = UpdateCurrentTimerZone();
 
 	if (ElapsedTime >= WeaponEquipTime)
 	{
@@ -274,6 +280,12 @@ void AHeroCharacter::OnEquipTimerEnd()
 		ElapsedTime += GetWorldTimerManager().GetTimerElapsed(WeaponEquipedTimeHandler);
 	}
 
+	if (updatedZone)
+	{
+		GetWorldTimerManager().ClearTimer(WeaponEquipedTimeHandler);
+		GetWorldTimerManager().SetTimer(WeaponEquipedTimeHandler, this, &AHeroCharacter::OnEquipTimerEnd, GetZoneTimeDelay(CurrTimerZone), true);
+	}
+
 }
 
 void AHeroCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -283,9 +295,10 @@ void AHeroCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	GetWorldTimerManager().ClearAllTimersForObject(this);
 }
 
-void AHeroCharacter::UpdateCurrentTimerZone()
+bool AHeroCharacter::UpdateCurrentTimerZone()
 {
 	const float PercentageOfTime = (ElapsedTime / WeaponEquipTime) * 100.0f;
+	auto LastZone = CurrTimerZone;
 
 	if (PercentageOfTime < 50.0f)
 	{
@@ -303,16 +316,37 @@ void AHeroCharacter::UpdateCurrentTimerZone()
 	{
 		CurrTimerZone = ECountdownTimerZone::CTZ_Normal;
 	}
+
+	return (LastZone != CurrTimerZone);
 }
 
 void AHeroCharacter::PlayCurrSoundCue()
 {
-	UpdateCurrentTimerZone();
+	if (!SoundMap.Contains(CurrTimerZone))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Unable to locate sound file to play"));
+		return;
+	}
 
 	auto Sound = SoundMap[CurrTimerZone];
 
 	if (Sound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, Sound, GetActorLocation());
+	}
+}
+
+float AHeroCharacter::GetZoneTimeDelay(ECountdownTimerZone const& TimerZone)
+{
+	switch (TimerZone)
+	{
+	case ECountdownTimerZone::CTZ_Normal:
+		return 1.0f;
+	case ECountdownTimerZone::CTZ_High:
+		return 0.5f;
+	case ECountdownTimerZone::CTZ_Critical:
+		return 0.25f;
+	default:
+		return 1.0f;
 	}
 }

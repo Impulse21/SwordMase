@@ -54,7 +54,9 @@ AHeroCharacter::AHeroCharacter()
 	PickupCollector->OnComponentBeginOverlap.AddDynamic(this, &AHeroCharacter::OnPickupOverlap);
 	PickupCollector->AttachTo(GetMesh());
 
+	FreeToAnimate = true;
 }
+
 
 void AHeroCharacter::Tick(float DeltaTime)
 {
@@ -74,10 +76,24 @@ void AHeroCharacter::Tick(float DeltaTime)
 		PlayAttackAnim();
 	}
 
+	if (Attacking)
+	{
+		TraceWeapon();
+	}
 }
 
 void AHeroCharacter::GetCharacterInfo_Implementation(FCharacterAnimationInfo & animInfo)
 {
+}
+
+void AHeroCharacter::AttackStartEnd_Implementation(bool IsAttacking)
+{
+	Attacking = IsAttacking;
+}
+
+void AHeroCharacter::EndAnimInfo_Implementation(bool IsFreeToAnimate, bool LockRotation)
+{
+	FreeToAnimate = IsFreeToAnimate;
 }
 
 void AHeroCharacter::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
@@ -153,7 +169,6 @@ void AHeroCharacter::OnStartAttacking()
 	if (EquipedWeapon)
 	{
 		PlayerInput.AttackPressed = true;
-		UE_LOG(LogTemp, Warning, TEXT("Attacking"));
 		GetWorldTimerManager().SetTimer(AttackTimeHandler, this, &AHeroCharacter::OnStopAttacking, 3.0f, true, 0.0f);
 	}
 }
@@ -211,11 +226,36 @@ FName AHeroCharacter::GetInventoryAttachPoint(EItemType const & slot)
 
 void AHeroCharacter::PlayAttackAnim()
 {
-	UCharacterAnimInstance* AnimInstance = Cast<UCharacterAnimInstance>(GetMesh()->GetAnimInstance());
-
-	if (AnimInstance && !AnimInstance->IsPlayingAttackAnim())
+	if (!FreeToAnimate)
 	{
-		AnimInstance->Attack();
+		UE_LOG(LogTemp, Warning, TEXT("We are not free to animate"));
+		return;
+	}
+
+	if (AttackAnims.AttackAnimations.Num() <= 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("There are no animations to animate"));
+		return;
+	}
+
+	uint8 * CurrAnimIndex = &AttackAnims.CurrAnimIndex;
+	UAnimMontage* CurrAnim = nullptr;
+
+	CurrAnim = AttackAnims.AttackAnimations[*CurrAnimIndex];
+
+	*CurrAnimIndex += 1;
+	if (*CurrAnimIndex >= AttackAnims.AttackAnimations.Num())
+	{
+		*CurrAnimIndex = 0;
+	}
+
+
+	if (CurrAnim)
+	{
+		PlayAnimMontage(CurrAnim);
+		FreeToAnimate = false;
+		FString Name = (CurrAnim) ? *CurrAnim->GetName() : TEXT("");
+		UE_LOG(LogTemp, Warning, TEXT("Animation Selected to play is [%s]"), *Name);
 	}
 }
 
@@ -226,12 +266,11 @@ void AHeroCharacter::OnPickupOverlap_Implementation(UPrimitiveComponent * Overla
 													bool bFromSweep, 
 													const FHitResult & SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("On Pickup Occured"));
-
 	APickup* pickable = Cast<APickup>(OtherActor);
 
 	if (pickable)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("On Pickup Occured"));
 		pickable->OnPickup(this);
 		UpdatePlayerScore.Broadcast(pickable->GetScoreValue());
 	}
@@ -287,6 +326,7 @@ void AHeroCharacter::OnEquipTimerEnd()
 	}
 
 }
+
 
 void AHeroCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
@@ -349,4 +389,47 @@ float AHeroCharacter::GetZoneTimeDelay(ECountdownTimerZone const& TimerZone)
 	default:
 		return 1.0f;
 	}
+}
+
+void AHeroCharacter::TraceWeapon()
+{
+	if (EquipedWeapon == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Weapon is not equiped"));
+		return;
+	}
+
+	UStaticMeshComponent* WeaponMesh = EquipedWeapon->GetMesh();
+
+	FVector TraceStart = WeaponMesh->GetSocketLocation("TraceStart");
+	FVector TraceEnd = WeaponMesh->GetSocketLocation("TraceEnd");
+
+	FCollisionQueryParams TraceWeaponParams = FCollisionQueryParams(FName(TEXT("TraceWeaponParams")), true, this);
+	TraceWeaponParams.bTraceComplex = true;
+	TraceWeaponParams.bTraceAsyncScene = true;
+	TraceWeaponParams.bReturnPhysicalMaterial = false;
+
+	UE_LOG(LogTemp, Warning, TEXT("Tracing Weapon"));
+
+	/** Debug */
+	if (DebugFlags.DrawUsableLineTrace)
+	{
+		const FName TraceTag("TraceWeaponParams");
+		GetWorld()->DebugDrawTraceTag = TraceTag;
+
+		TraceWeaponParams.TraceTag = TraceTag;
+	}
+	/** End Debug  */
+
+	TArray<FHitResult> HitResults;
+	GetWorld()->LineTraceMultiByChannel(HitResults, TraceStart, TraceEnd, ECC_Visibility, TraceWeaponParams);
+
+	UE_LOG(LogTemp, Warning, TEXT("We Hit %d Actors"), HitResults.Num());
+		/*
+		if (HitResults.Actor->IsA<ABaseCharacter>())
+		{
+			UGameplayStatics::ApplyDamage(HitResults.Actor.Get(), EquipedWeapon->GetSwordDamage(), this->GetController(), this, EquipedWeapon->GetDamageType());
+		}
+		*/
+
 }

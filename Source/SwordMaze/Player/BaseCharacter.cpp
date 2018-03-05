@@ -38,16 +38,17 @@ void ABaseCharacter::ToggleDefend(bool defend)
 
 float ABaseCharacter::TakeDamage(float Damage, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser)
 {
+	UE_LOG(LogTemp, Warning, TEXT("I have sustained critical damage [%s]"), *this->GetName());
 	if (bIsDead)
 	{
 		return 0.0f;
 	}
 
-	const float actualDmg = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	const auto ActualDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 
-	if (actualDmg > 0.0f)
+	if (ActualDamage > 0.0f)
 	{
-		CalculateHealth(actualDmg);
+		CalculateHealth(ActualDamage);
 
 		if (bIsDead)
 		{
@@ -55,7 +56,7 @@ float ABaseCharacter::TakeDamage(float Damage, FDamageEvent const & DamageEvent,
 		}
 	}
 
-	return actualDmg;
+	return ActualDamage;
 }
 
 void ABaseCharacter::OnDeath(AActor* DamageCauser, FDamageEvent const& DamageEvent)
@@ -68,6 +69,7 @@ void ABaseCharacter::OnDeath(AActor* DamageCauser, FDamageEvent const& DamageEve
 
 	if (DeathAnimation)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Playing Death Animation"));
 		PlayAnimMontage(DeathAnimation);
 	}
 
@@ -85,3 +87,4 @@ void ABaseCharacter::CalculateDead()
 {
 	bIsDead = (Health <= 0);
 }
+

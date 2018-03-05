@@ -69,6 +69,12 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Player")
 	void GetCharacterInfo(FCharacterAnimationInfo& animInfo);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Player)
+	void AttackStartEnd(bool IsAttacking);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Player)
+	void EndAnimInfo(bool IsFreeToAnimate, bool LockRotation);
+
 	UFUNCTION(BlueprintCallable, Category = "Player")
 	void AddWeapon(class ABaseWeapon* Weapon);
 
@@ -85,10 +91,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Player)
 	FName GetInventoryAttachPoint(EItemType const& slot);
 
-
 	UPROPERTY(BlueprintAssignable, Category = PickupEvent)
 	FOnPlayerScoreUpdate UpdatePlayerScore;
 
+	UFUNCTION(BlueprintCallable, Category = "Damage")
+	void TraceWeapon();
 
 	/** Inputs					*/
 protected:
@@ -201,7 +208,6 @@ private:
 	
 	UPROPERTY()
 	ECountdownTimerZone CurrTimerZone;
-
 
 	bool bHasNewFocus;	
 };

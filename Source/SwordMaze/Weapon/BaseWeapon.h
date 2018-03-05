@@ -27,9 +27,6 @@ class SWORDMAZE_API ABaseWeapon : public AActor, public IEquipable
 public:	
 	// Sets default values for this actor's properties
 	ABaseWeapon();
-	
-	UFUNCTION()
-	void NotifyActorBeginOverlap(AActor* OtherActor) override;
 
 public:
 	UFUNCTION(BlueprintNativeEvent, Category = Weapon)
@@ -50,6 +47,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	void DetachMeshFromPawn();
 
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	FORCEINLINE class UStaticMeshComponent* GetMesh() { return Mesh; };
+
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	FORCEINLINE float GetSwordDamage() const { return SwordDamage; };
+
+	UFUNCTION(BlueprintPure, Category = Weapon)
+	FORCEINLINE TSubclassOf<UDamageType> GetDamageType() { return DamageType; };
+
 protected:
 	/** Weapon's Mesh			*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -61,7 +67,7 @@ protected:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Attacking")
-	TSubclassOf<UDamageType> swordDamageType;
+	TSubclassOf<UDamageType> DamageType;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Attacking")
 	float SwordDamage;
@@ -71,4 +77,5 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Weapon)
 	EItemType InventorySlot;
+
 };

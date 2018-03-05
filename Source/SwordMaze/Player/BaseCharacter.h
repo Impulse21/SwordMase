@@ -6,6 +6,18 @@
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
 
+USTRUCT(Blueprintable)
+struct FAnimMontageList
+{
+	GENERATED_BODY()
+
+	UPROPERTY(transient)
+	uint8 CurrAnimIndex;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = CharacterAnim)
+	TArray<class UAnimMontage*> AttackAnimations;
+};
+
 UCLASS()
 class SWORDMAZE_API ABaseCharacter : public ACharacter
 {
@@ -28,7 +40,7 @@ public:
 	void OnDeath(AActor* DamageCauser, FDamageEvent const& DamageEvent);
 
 	UFUNCTION(BlueprintPure, Category = BaseCharacter)
-	FORCEINLINE bool IsAttacking() const { return Attacking; };
+	FORCEINLINE  bool IsAttacking() const { return Attacking; };
 
 public:
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent,
@@ -41,6 +53,9 @@ public:
 	virtual void ToggleDefend(bool defend);
 
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseChatacter)
+	FAnimMontageList AttackAnims;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = BaseChatacter)
 	bool Attacking;
 

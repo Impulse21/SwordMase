@@ -16,17 +16,7 @@ ABaseWeapon::ABaseWeapon()
 	}
 
 	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
 	InventorySlot = EItemType::EI_Primary;
-}
-
-void ABaseWeapon::NotifyActorBeginOverlap(AActor* OtherActor)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Began Overlap with  %s"), *OtherActor->GetName());
-	if (OtherActor)
-	{
-		DamageActor(OtherActor);
-	}
 }
 
 void ABaseWeapon::OnEquip_Implementation(AHeroCharacter* NewOwner)
@@ -81,18 +71,16 @@ void ABaseWeapon::DetachMeshFromPawn()
 
 void ABaseWeapon::DamageActor(AActor * HitActor)
 {
-	/*
-	// Check if this actor is damageable
 	if (HitActor->bCanBeDamaged && !HitActor->ActorHasTag("Friendly"))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Causing Damage to actor %s"), *HitActor->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("Is Owner Pawn attacking [%d]"), MyPawn->IsAttacking());
 		if (MyPawn->IsAttacking())
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Causing Damage to actor %s"), *HitActor->GetName());
 			FPointDamageEvent dmgEvent;
-			dmgEvent.DamageTypeClass = swordDamageType;
+			dmgEvent.DamageTypeClass = DamageType;
 			dmgEvent.Damage = SwordDamage;
-			HitActor->TakeDamage(dmgEvent.Damage, dmgEvent, MyPawn->GetController(), this);
 		}
 	}
-	*/
 }
+

@@ -41,5 +41,12 @@ class SWORDMAZE_API ICharacterAnimation
 		// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Player)
-		void GetCharacterInfo(FCharacterAnimationInfo& animInfo);
+	void GetCharacterInfo(FCharacterAnimationInfo& animInfo);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Player)
+	void AttackStartEnd(bool Attacking);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Player)
+	void EndAnimInfo(bool FreeToAnimate, bool LockRotation);
 };
+

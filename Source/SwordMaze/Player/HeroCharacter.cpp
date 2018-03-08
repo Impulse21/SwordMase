@@ -422,14 +422,15 @@ void AHeroCharacter::TraceWeapon()
 	/** End Debug  */
 
 	TArray<FHitResult> HitResults;
-	GetWorld()->LineTraceMultiByChannel(HitResults, TraceStart, TraceEnd, ECC_Visibility, TraceWeaponParams);
+	GetWorld()->LineTraceMultiByChannel(HitResults, TraceStart, TraceEnd, ECC_GameTraceChannel14, TraceWeaponParams);
 
 	UE_LOG(LogTemp, Warning, TEXT("We Hit %d Actors"), HitResults.Num());
-		/*
-		if (HitResults.Actor->IsA<ABaseCharacter>())
-		{
-			UGameplayStatics::ApplyDamage(HitResults.Actor.Get(), EquipedWeapon->GetSwordDamage(), this->GetController(), this, EquipedWeapon->GetDamageType());
-		}
-		*/
 
+	for (auto& HitResult : HitResults)
+	{
+		if (HitResult.Actor->IsA<ABaseCharacter>())
+		{
+			UGameplayStatics::ApplyDamage(HitResult.Actor.Get(), EquipedWeapon->GetSwordDamage(), this->GetController(), this, EquipedWeapon->GetDamageType());
+		}
+	}
 }

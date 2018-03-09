@@ -4,6 +4,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
+#include "AI/BotWaypoint.h"
 #include "EnemyCharacter.h"
 
 
@@ -14,6 +15,7 @@ AEnemyAIController::AEnemyAIController()
 
 	TargetEnemyKeyName = "TargetEnemy";
 	TargetLocationKeyName = "TargetLocation";
+	BotWaypointKeyName = "CurrBotWaypoint";
 }
 
 void AEnemyAIController::Possess(APawn * InPawn)
@@ -88,5 +90,23 @@ void AEnemyAIController::SetTargetLocation(FVector const& NewTarget)
 	if (BlackboardComponent)
 	{
 		BlackboardComponent->SetValueAsVector(TargetLocationKeyName, NewTarget);
+	}
+}
+
+ABotWaypoint* AEnemyAIController::GetWaypoint()
+{
+	if (BlackboardComponent == nullptr)
+	{
+		return false;
+	}
+
+	return Cast<ABotWaypoint>(BlackboardComponent->GetValueAsObject(BotWaypointKeyName));
+}
+
+void AEnemyAIController::SetWaypoint(class ABotWaypoint* NewWaypoint)
+{
+	if (BlackboardComponent)
+	{
+		BlackboardComponent->SetValueAsObject(BotWaypointKeyName, NewWaypoint);
 	}
 }

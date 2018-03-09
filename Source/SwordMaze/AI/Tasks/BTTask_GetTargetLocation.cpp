@@ -6,23 +6,40 @@
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "Player/HeroCharacter.h"
+#include "AI/Navigation/NavigationSystem.h"
+#include "AI/BotWaypoint.h"
+/* This contains includes all key types like UBlackboardKeyType_Vector used below. */
+#include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
 
 EBTNodeResult::Type UBTTask_GetTargetLocation::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	AEnemyAIController *CharPC = Cast<AEnemyAIController>(OwnerComp.GetAIOwner());
+	AEnemyAIController *Controller = Cast<AEnemyAIController>(OwnerComp.GetAIOwner());
 
-	AHeroCharacter* Enemy = Cast<AHeroCharacter>
-		(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BlackboardKey.SelectedKeyName));
-
-	if (Enemy && CharPC)
+	if (Controller == nullptr)
 	{
-		FVector position = Enemy->GetActorLocation();
-		UE_LOG(LogTemp, Warning, TEXT("Setting Target Location (%f, %f, %f)"), position.X, position.Y, position.Z);
-
-		CharPC->SetTargetLocation(position);
-
-		return EBTNodeResult::Succeeded;
+		return EBTNodeResult::Failed;
 	}
 
+	ABotWaypoint* CurrWaypoint = Controller->GetWaypoint();
+
+	if (CurrWaypoint == nullptr)
+	{
+		return EBTNodeResult::Failed;
+	}
+
+	const float SearchRadius = 10.0f;
+	const FVector SearchOrigin = CurrWaypoint->GetActorLocation();
+	const FVector Loc = UNavigationSystem::GetRandomReachablePointInRadius(Controller, SearchOrigin, SearchRadius);
+
+	FVector CurrTargetLocation;
+	if (Controller->GetTargetLocation(CurrTargetLocation))
+	{
+		if (Loc != CurrTargetLocation)
+		{
+			OwnerComp.GetBlackboardComponent()->SetValue<UBlackboardKeyType_Vector>(BlackboardKey.GetSelectedKeyID(), Loc);
+			return EBTNodeResult::Succeeded;
+		}
+	}
+	
 	return EBTNodeResult::Failed;
 }

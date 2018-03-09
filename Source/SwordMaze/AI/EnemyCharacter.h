@@ -25,4 +25,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Enemy)
 	class UBehaviorTree* BotBehavior;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Enemy)
+	class UCapsuleComponent* MeleeCollisionComp;
+
 };

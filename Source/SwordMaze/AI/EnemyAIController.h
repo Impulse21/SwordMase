@@ -44,6 +44,12 @@ public:
 	bool GetTargetLocation(FVector& Vector);
 
 	UFUNCTION(BlueprintCallable, Category = EnemyAI)
+	void SetWaypoint(class ABotWaypoint* NewW);
+
+	UFUNCTION(BlueprintCallable, Category = EnemyAI)
+	class ABotWaypoint* GetWaypoint();
+
+	UFUNCTION(BlueprintCallable, Category = EnemyAI)
 	void SetTargetLocation(FVector const& NewTarget);
 
 	UFUNCTION(BlueprintCallable, Category = EnemyAI)
@@ -62,6 +68,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "EnemyAI")
 	FName TargetLocationKeyName;
+
+	UPROPERTY(EditDefaultsOnly, Category = "EnemyAI")
+	FName BotWaypointKeyName;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = EnemyAI)

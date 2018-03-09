@@ -27,6 +27,8 @@ public:
 	// Sets default values for this character's properties
 	ABaseCharacter();
 
+	virtual void BeginPlay() override;
+
 	UFUNCTION(BlueprintPure, Category = BaseCharacter)
 	FORCEINLINE bool IsDead() const { return bIsDead; };
 
@@ -41,6 +43,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = BaseCharacter)
 	FORCEINLINE  bool IsAttacking() const { return Attacking; };
+
+	UFUNCTION(BlueprintPure, Category = BaseCharacter)
+	FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; };
 
 public:
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent,
@@ -78,12 +83,15 @@ protected:
 	float RunSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = BaseCharacter)
-	float Health;
+	float MaxHealth;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = BaseCharacter)
 	class UAnimMontage* DeathAnimation;
 
 private:
+	UPROPERTY(Transient)
+	float CurrentHealth;
+
 	bool bIsDead;
 };
 	

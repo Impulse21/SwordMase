@@ -13,12 +13,19 @@ ABaseCharacter::ABaseCharacter()
 	WalkSpeed = 600.0f;
 	RunSpeed = 1000.0f;
 
-	Health = 100.0f;
+	MaxHealth = 100.0f;
 
 	bIsDead = false;
 
 	// Temp
 	bCanBeDamaged = true;
+}
+
+void ABaseCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	CurrentHealth = MaxHealth;
 }
 
 void ABaseCharacter::SetSprinting(bool sprinting)
@@ -67,24 +74,26 @@ void ABaseCharacter::OnDeath(AActor* DamageCauser, FDamageEvent const& DamageEve
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 
+	float LifeSpan = 3.0f;
 	if (DeathAnimation)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Playing Death Animation"));
-		PlayAnimMontage(DeathAnimation);
+		LifeSpan += PlayAnimMontage(DeathAnimation);
 	}
 
-	SetLifeSpan(4.0f);
+	UE_LOG(LogTemp, Warning, TEXT("Setting Pawns lifespan to %f"), LifeSpan);
+	SetLifeSpan(LifeSpan);
 }
 
 void ABaseCharacter::CalculateHealth(float delta)
 {
-	Health -= delta;
-	UE_LOG(LogTemp, Warning, TEXT("I %s health is affected: %f"), *this->GetName(), Health);
+	CurrentHealth -= delta;
+	UE_LOG(LogTemp, Warning, TEXT("I %s health is affected: %f"), *this->GetName(), CurrentHealth);
 	CalculateDead();
 }
 
 void ABaseCharacter::CalculateDead()
 {
-	bIsDead = (Health <= 0);
+	bIsDead = (CurrentHealth <= 0);
 }
 

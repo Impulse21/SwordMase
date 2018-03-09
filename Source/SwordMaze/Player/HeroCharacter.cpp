@@ -409,8 +409,6 @@ void AHeroCharacter::TraceWeapon()
 	TraceWeaponParams.bTraceAsyncScene = true;
 	TraceWeaponParams.bReturnPhysicalMaterial = false;
 
-	UE_LOG(LogTemp, Warning, TEXT("Tracing Weapon"));
-
 	/** Debug */
 	if (DebugFlags.DrawUsableLineTrace)
 	{
@@ -423,8 +421,6 @@ void AHeroCharacter::TraceWeapon()
 
 	TArray<FHitResult> HitResults;
 	GetWorld()->LineTraceMultiByChannel(HitResults, TraceStart, TraceEnd, ECC_GameTraceChannel14, TraceWeaponParams);
-
-	UE_LOG(LogTemp, Warning, TEXT("We Hit %d Actors"), HitResults.Num());
 
 	for (auto& HitResult : HitResults)
 	{

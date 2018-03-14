@@ -21,6 +21,16 @@ public:
 	UFUNCTION(BlueprintPure, Category = EnemyAI)
 	FORCEINLINE class UBehaviorTree* GetBotBehavior() { return BotBehavior; };
 
+	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaSeconds) override;
+
+	UFUNCTION()
+	void OnSeePlayer(APawn* Pawn);
+
+	UFUNCTION(BlueprintCallable, Category = Enemy)
+	void PerformMeleeStrike(AActor* HitActor);
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Enemy)
 	class UBehaviorTree* BotBehavior;
@@ -28,4 +38,28 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Enemy)
 	class UCapsuleComponent* MeleeCollisionComp;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Enemy)
+	class UPawnSensingComponent* SensingComp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Enemy)
+	float SensedTimeout;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Enemy)
+	float MeleeDamage;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Enemy)
+	float MeleeStrikeCooldown;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Enemy)
+	TSubclassOf<UDamageType> MeleeDamageType;
+
+private:
+	UPROPERTY(Transient)
+	float LastMeleeStrike;
+
+	UPROPERTY(Transient)
+	float LastSeenTime;
+
+	UPROPERTY(Transient)
+	bool SensedPawn;
 };

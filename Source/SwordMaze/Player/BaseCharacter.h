@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Weapon/BaseWeapon.h"
+#include "CharacterAnimation.h"
 #include "BaseCharacter.generated.h"
 
 USTRUCT(Blueprintable)
@@ -19,7 +21,7 @@ struct FAnimMontageList
 };
 
 UCLASS()
-class SWORDMAZE_API ABaseCharacter : public ACharacter
+class SWORDMAZE_API ABaseCharacter : public ACharacter, public ICharacterAnimation
 {
 	GENERATED_BODY()
 
@@ -47,6 +49,15 @@ public:
 	UFUNCTION(BlueprintPure, Category = BaseCharacter)
 	FORCEINLINE float GetCurrentHealth() const { return CurrentHealth; };
 
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = BaseCharacter)
+	void GetCharacterInfo(FCharacterAnimationInfo& animInfo);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Player)
+	void AttackStartEnd(bool IsAttacking);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Player)
+	void EndAnimInfo(bool IsFreeToAnimate, bool LockRotation);
+
 public:
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent,
 		AController* EventInstigator, AActor* DamageCauser) override;
@@ -56,6 +67,10 @@ public:
 	virtual bool IsSprinting();
 
 	virtual void ToggleDefend(bool defend);
+
+protected:
+	UFUNCTION(BlueprintCallable, Category = Player)
+	void PlayAttackAnim();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BaseChatacter)

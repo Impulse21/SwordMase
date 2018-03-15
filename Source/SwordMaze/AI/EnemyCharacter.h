@@ -31,6 +31,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Enemy)
 	void PerformMeleeStrike(AActor* HitActor);
 
+	UFUNCTION(BlueprintCallable, Category = Enemy)
+	void SimulateMeleeStrike();
+
+	UFUNCTION(BlueprintCallable, Category = Enemy)
+	void OnMeleeCompBeginOverlap(class UPrimitiveComponent* OverlappedComponent, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+	
+	UFUNCTION(BlueprintCallable, Category = Enemy)
+	void OnRetriggerMeleeStrike();
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Enemy)
 	class UBehaviorTree* BotBehavior;
@@ -55,7 +64,7 @@ protected:
 
 private:
 	UPROPERTY(Transient)
-	float LastMeleeStrike;
+	FTimerHandle TimerHandle_MeleeAttack;
 
 	UPROPERTY(Transient)
 	float LastSeenTime;

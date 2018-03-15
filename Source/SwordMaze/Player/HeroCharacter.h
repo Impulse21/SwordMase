@@ -4,8 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Player/BaseCharacter.h"
-#include "Weapon/BaseWeapon.h"
-#include "CharacterAnimation.h"
 #include "HeroCharacter.generated.h"
 
 
@@ -53,7 +51,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerScoreUpdate, int, DeltaScor
  * 
  */
 UCLASS()
-class SWORDMAZE_API AHeroCharacter : public ABaseCharacter, public ICharacterAnimation
+class SWORDMAZE_API AHeroCharacter : public ABaseCharacter
 {
 	GENERATED_BODY()
 	
@@ -65,15 +63,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Player")
-	void GetCharacterInfo(FCharacterAnimationInfo& animInfo);
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Player)
-	void AttackStartEnd(bool IsAttacking);
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Player)
-	void EndAnimInfo(bool IsFreeToAnimate, bool LockRotation);
 
 	UFUNCTION(BlueprintCallable, Category = "Player")
 	void AddWeapon(class ABaseWeapon* Weapon);
@@ -182,10 +171,6 @@ protected:
 
 	UPROPERTY(Transient)
 	class ABaseWeapon* EquipedWeapon;
-
-private:
-	UFUNCTION(BlueprintCallable, Category = Player)
-	void PlayAttackAnim();
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Equipment")

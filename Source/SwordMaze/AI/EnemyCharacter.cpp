@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/World.h"
+#include "TimerManager.h"
 
 /* AI Include */
 #include "Perception/PawnSensingComponent.h"
@@ -29,6 +30,11 @@ void AEnemyCharacter::BeginPlay()
 	{
 		SensingComp->OnSeePawn.AddDynamic(this, &AEnemyCharacter::OnSeePlayer);
 	}
+
+	if (MeleeCollisionComp)
+	{
+		MeleeCollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AEnemyCharacter::OnMeleeCompBeginOverlap);
+	}
 }
 
 void AEnemyCharacter::OnSeePlayer(APawn* Pawn)
@@ -48,12 +54,6 @@ void AEnemyCharacter::OnSeePlayer(APawn* Pawn)
 
 void AEnemyCharacter::PerformMeleeStrike(AActor* HitActor)
 {
-	if (LastMeleeStrike > GetWorld()->GetTimeSeconds() - MeleeStrikeCooldown)
-	{
-		// Cool down timer has not occured
-		return;
-	}
-
 	if (HitActor && HitActor != this && !IsDead())
 	{
 		AHeroCharacter* HeroActor = Cast<AHeroCharacter>(HitActor);
@@ -64,6 +64,7 @@ void AEnemyCharacter::PerformMeleeStrike(AActor* HitActor)
 		}
 
 		UGameplayStatics::ApplyDamage(HeroActor, MeleeDamage, this->GetController(), this, MeleeDamageType);
+		SimulateMeleeStrike();
 	}
 }
 
@@ -82,4 +83,31 @@ void AEnemyCharacter::Tick(float DeltaSeconds)
 			AiController->SetTargetEnemy(nullptr);
 		}
 	}
+}
+
+void AEnemyCharacter::SimulateMeleeStrike()
+{
+	PlayAttackAnim();
+}
+
+void AEnemyCharacter::OnMeleeCompBeginOverlap(class UPrimitiveComponent* OverlappedComponent, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+{
+	PerformMeleeStrike(OtherActor);
+
+	GetWorldTimerManager().SetTimer(TimerHandle_MeleeAttack, this, &AEnemyCharacter::OnRetriggerMeleeStrike, MeleeStrikeCooldown, true);
+}
+
+void AEnemyCharacter::OnRetriggerMeleeStrike()
+{
+	TArray<AActor*> Overlaps;
+	MeleeCollisionComp->GetOverlappingActors(Overlaps, AHeroCharacter::StaticClass());
+
+	// There should only ever be one Hero. If we don't g
+	if (Overlaps.Num() != 1)
+	{
+		TimerHandle_MeleeAttack.Invalidate();
+		return;
+	}
+
+	PerformMeleeStrike(Overlaps[0]);
 }

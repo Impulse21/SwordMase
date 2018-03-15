@@ -19,6 +19,7 @@ ABaseCharacter::ABaseCharacter()
 
 	// Temp
 	bCanBeDamaged = true;
+	FreeToAnimate = true;
 }
 
 void ABaseCharacter::BeginPlay()
@@ -27,6 +28,7 @@ void ABaseCharacter::BeginPlay()
 
 	CurrentHealth = MaxHealth;
 }
+
 
 void ABaseCharacter::SetSprinting(bool sprinting)
 {
@@ -95,5 +97,54 @@ void ABaseCharacter::CalculateHealth(float delta)
 void ABaseCharacter::CalculateDead()
 {
 	bIsDead = (CurrentHealth <= 0);
+}
+
+void ABaseCharacter::PlayAttackAnim()
+{
+	if (!FreeToAnimate)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("We are not free to animate"));
+		return;
+	}
+
+	if (AttackAnims.AttackAnimations.Num() <= 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("There are no animations to animate"));
+		return;
+	}
+
+	uint8 * CurrAnimIndex = &AttackAnims.CurrAnimIndex;
+	UAnimMontage* CurrAnim = nullptr;
+
+	CurrAnim = AttackAnims.AttackAnimations[*CurrAnimIndex];
+
+	*CurrAnimIndex += 1;
+	if (*CurrAnimIndex >= AttackAnims.AttackAnimations.Num())
+	{
+		*CurrAnimIndex = 0;
+	}
+
+
+	if (CurrAnim)
+	{
+		PlayAnimMontage(CurrAnim);
+		FreeToAnimate = false;
+		FString Name = (CurrAnim) ? *CurrAnim->GetName() : TEXT("");
+		UE_LOG(LogTemp, Warning, TEXT("Animation Selected to play is [%s]"), *Name);
+	}
+}
+
+void ABaseCharacter::GetCharacterInfo_Implementation(FCharacterAnimationInfo & animInfo)
+{
+}
+
+void ABaseCharacter::AttackStartEnd_Implementation(bool IsAttacking)
+{
+	Attacking = IsAttacking;
+}
+
+void ABaseCharacter::EndAnimInfo_Implementation(bool IsFreeToAnimate, bool LockRotation)
+{
+	FreeToAnimate = IsFreeToAnimate;
 }
 

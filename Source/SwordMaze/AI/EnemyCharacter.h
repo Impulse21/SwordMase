@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Player/BaseCharacter.h"
+#include "Interfaces/MeleeAttackAnimation.h"
 #include "EnemyCharacter.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class SWORDMAZE_API AEnemyCharacter : public ABaseCharacter
+class SWORDMAZE_API AEnemyCharacter : public ABaseCharacter, public IMeleeAttackAnimation
 {
 	GENERATED_BODY()
 
@@ -40,6 +41,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Enemy)
 	void OnRetriggerMeleeStrike();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Enemy)
+	void AttackLeftStart(bool LeftAttack);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = Enemy)
+	void AttackRightStart(bool RightAtttack);
+
+protected:
+	UFUNCTION(BlueprintCallable, Category = Enemy)
+	void AttackTrace(FName const& TraceStartSocketName, FName const& TraceEndSocketName);
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Enemy)
 	class UBehaviorTree* BotBehavior;
@@ -68,6 +79,12 @@ private:
 
 	UPROPERTY(Transient)
 	float LastSeenTime;
+
+	UPROPERTY(Transient)
+	bool IsAttackingLeft;
+
+	UPROPERTY(Transient)
+	bool IsAttackingRight;
 
 	UPROPERTY(Transient)
 	bool SensedPawn;

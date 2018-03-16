@@ -5,6 +5,7 @@
 #include "Player/HeroCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
 
@@ -56,14 +57,6 @@ void AEnemyCharacter::PerformMeleeStrike(AActor* HitActor)
 {
 	if (HitActor && HitActor != this && !IsDead())
 	{
-		AHeroCharacter* HeroActor = Cast<AHeroCharacter>(HitActor);
-
-		if (HeroActor == nullptr)
-		{
-			return;
-		}
-
-		UGameplayStatics::ApplyDamage(HeroActor, MeleeDamage, this->GetController(), this, MeleeDamageType);
 		SimulateMeleeStrike();
 	}
 }
@@ -82,6 +75,26 @@ void AEnemyCharacter::Tick(float DeltaSeconds)
 		{
 			AiController->SetTargetEnemy(nullptr);
 		}
+	}
+
+	if (Attacking)
+	{
+		FName SocketStart;
+		FName SocketEnd;
+
+		if (IsAttackingRight)
+		{
+			SocketStart = TEXT("Right_Trace_Start");
+			SocketEnd = TEXT("Right_Trace_End");
+		}
+
+		if (IsAttackingLeft)
+		{
+			SocketStart = TEXT("Left_Trace_Start");
+			SocketEnd = TEXT("Left_Trace_End");
+		}
+
+		AttackTrace(SocketStart, SocketEnd);
 	}
 }
 
@@ -102,7 +115,7 @@ void AEnemyCharacter::OnRetriggerMeleeStrike()
 	TArray<AActor*> Overlaps;
 	MeleeCollisionComp->GetOverlappingActors(Overlaps, AHeroCharacter::StaticClass());
 
-	// There should only ever be one Hero. If we don't g
+	// There should only ever be one Hero. If we don't get a hero End the Timer
 	if (Overlaps.Num() != 1)
 	{
 		TimerHandle_MeleeAttack.Invalidate();
@@ -110,4 +123,38 @@ void AEnemyCharacter::OnRetriggerMeleeStrike()
 	}
 
 	PerformMeleeStrike(Overlaps[0]);
+}
+
+
+void AEnemyCharacter::AttackLeftStart_Implementation(bool LeftAttack)
+{
+	IsAttackingLeft = LeftAttack;
+}
+
+void AEnemyCharacter::AttackRightStart_Implementation(bool RightAttack)
+{
+	IsAttackingRight = RightAttack;
+}
+
+void AEnemyCharacter::AttackTrace(FName const& TraceStartSocketName, FName const& TraceEndSocketName)
+{
+	FVector TraceStart = GetMesh()->GetSocketLocation(TraceStartSocketName);
+	FVector TraceEnd = GetMesh()->GetSocketLocation(TraceEndSocketName);
+
+	FCollisionQueryParams TraceWeaponParams = FCollisionQueryParams(FName(TEXT("TraceWeaponParams")), true, this);
+	TraceWeaponParams.bTraceComplex = true;
+	TraceWeaponParams.bTraceAsyncScene = true;
+	TraceWeaponParams.bReturnPhysicalMaterial = false;
+	/** End Debug  */
+
+	TArray<FHitResult> HitResults;
+	GetWorld()->LineTraceMultiByChannel(HitResults, TraceStart, TraceEnd, ECC_GameTraceChannel14, TraceWeaponParams);
+
+	for (auto& HitResult : HitResults)
+	{
+		if (HitResult.Actor->IsA<AHeroCharacter>())
+		{
+			UGameplayStatics::ApplyDamage(HitResult.Actor.Get(), MeleeDamage, this->GetController(), this, MeleeDamageType);
+		}
+	}
 }

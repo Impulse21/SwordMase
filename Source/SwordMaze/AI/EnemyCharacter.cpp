@@ -55,7 +55,7 @@ void AEnemyCharacter::OnSeePlayer(APawn* Pawn)
 
 void AEnemyCharacter::PerformMeleeStrike(AActor* HitActor)
 {
-	if (HitActor && HitActor != this && !IsDead())
+	if (IsDead())
 	{
 		SimulateMeleeStrike();
 	}
@@ -146,6 +146,13 @@ void AEnemyCharacter::AttackTrace(FName const& TraceStartSocketName, FName const
 	TraceWeaponParams.bTraceAsyncScene = true;
 	TraceWeaponParams.bReturnPhysicalMaterial = false;
 	/** End Debug  */
+
+	/** Debug */
+	const FName TraceTag("TraceWeaponParams");
+
+	GetWorld()->DebugDrawTraceTag = TraceTag;
+	TraceWeaponParams.TraceTag = TraceTag;
+
 
 	TArray<FHitResult> HitResults;
 	GetWorld()->LineTraceMultiByChannel(HitResults, TraceStart, TraceEnd, ECC_GameTraceChannel14, TraceWeaponParams);

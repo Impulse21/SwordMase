@@ -67,6 +67,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Player")
 	void AddWeapon(class ABaseWeapon* Weapon);
 
+	UFUNCTION(BlueprintCallable, Category = Player)
+	void OnDeath(AActor* DamageCauser, FDamageEvent const& DamageEvent) override;
+
+
+	UFUNCTION(BlueprintCallable, Category = Player)
+	void StopAllAnimMontages();
+	
 	/** Getter and setters			*/
 public:
 	/** Returns CameraBoom subobject **/

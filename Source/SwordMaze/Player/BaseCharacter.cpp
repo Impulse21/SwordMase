@@ -76,13 +76,7 @@ void ABaseCharacter::OnDeath(AActor* DamageCauser, FDamageEvent const& DamageEve
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 
-	float LifeSpan = 3.0f;
-	if (DeathAnimation)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Playing Death Animation"));
-		LifeSpan += PlayAnimMontage(DeathAnimation);
-	}
-
+	const float LifeSpan = 3.0f;
 	UE_LOG(LogTemp, Warning, TEXT("Setting Pawns lifespan to %f"), LifeSpan);
 	SetLifeSpan(LifeSpan);
 }

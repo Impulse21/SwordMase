@@ -383,3 +383,24 @@ void AHeroCharacter::TraceWeapon()
 		}
 	}
 }
+
+void AHeroCharacter::OnDeath(AActor * DamageCauser, FDamageEvent const & DamageEvent)
+{
+	if (!IsDead())
+	{
+		return;
+	}
+
+	StopAllAnimMontages();
+
+	Super::OnDeath(DamageCauser, DamageEvent);
+}
+
+void AHeroCharacter::StopAllAnimMontages()
+{
+	USkeletalMeshComponent* UseMesh = GetMesh();
+	if (UseMesh && UseMesh->AnimScriptInstance)
+	{
+		UseMesh->AnimScriptInstance->Montage_Stop(0.0f);
+	}
+}

@@ -41,7 +41,7 @@ public:
 	void CalculateDead();
 
 	UFUNCTION(BlueprintCallable, Category = BaseCharacter)
-	void OnDeath(AActor* DamageCauser, FDamageEvent const& DamageEvent);
+	virtual void OnDeath(AActor* DamageCauser, FDamageEvent const& DamageEvent);
 
 	UFUNCTION(BlueprintPure, Category = BaseCharacter)
 	FORCEINLINE  bool IsAttacking() const { return Attacking; };
